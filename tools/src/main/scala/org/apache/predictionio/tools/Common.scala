@@ -106,7 +106,7 @@ object Common extends EitherLogging {
       if (new File(pioHome + File.separator + "RELEASE").exists) {
         new File(pioHome + File.separator + "lib")
       } else {
-        new File(pioHome + File.separator + "assembly")
+        new File(Seq(pioHome, "assembly", "src", "universal", "lib").mkString(File.separator))
       }
     val coreFile = new File(coreDir, core)
     if (coreFile.exists) {
