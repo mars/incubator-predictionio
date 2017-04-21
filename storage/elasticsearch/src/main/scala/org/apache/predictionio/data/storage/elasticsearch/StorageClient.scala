@@ -57,10 +57,10 @@ class StorageClient(val config: StorageClientConfig)
     config.properties.get("USERNAME"),
     config.properties.get("PASSWORD"))
   val optionalBasicAuth: Option[(String, String)] = usernamePassword match {
-    case (Some(username), Some(password)) => Some(username, password)
-    case (Some(username), None)           => Some(username, "")
-    case (None, Some(password))           => Some("", password)
-    case (None, None)                     => None}
+    case (None, None)         => None
+    case (username, password) => Some(
+      (username.getOrElse(""), password.getOrElse("")))
+  }
 
   val client = ESClient(ESUtils.getHttpHosts(config), optionalBasicAuth)
 }
