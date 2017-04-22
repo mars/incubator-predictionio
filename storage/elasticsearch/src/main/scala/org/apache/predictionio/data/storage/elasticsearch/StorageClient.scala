@@ -62,7 +62,7 @@ class StorageClient(val config: StorageClientConfig)
       (username.getOrElse(""), password.getOrElse("")))
   }
 
-  val client = ESClient(ESUtils.getHttpHosts(config), optionalBasicAuth)
+  val client: ESClient = ESClient(ESUtils.getHttpHosts(config), optionalBasicAuth)
 }
 
 class BasicAuthProvider(
