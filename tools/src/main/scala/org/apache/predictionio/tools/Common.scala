@@ -94,9 +94,9 @@ object Common extends EitherLogging {
   }
 
   def jarFilesForSpark(pioHome: String): Array[File] = {
-    def jarFilesAt(path: File): Array[File] = path.listFiles filter {
-      _.getName.toLowerCase.endsWith(".jar")
-    }
+    def jarFilesAt(path: File): Array[File] = path.listFiles
+      .filter { _.getName.toLowerCase.endsWith(".jar") }
+      .sortBy( f => f.getName ) // stable sorting to avoid classpath variability
     jarFilesAt(new File(pioHome, "lib/spark"))
   }
 

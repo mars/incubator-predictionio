@@ -37,14 +37,20 @@ else
   JAR_CMD="jar"
 fi
 
+lib_spark_classpath=''
 # Use pio-assembly JAR from either RELEASE or assembly directory
 if [ -f "${FWDIR}/RELEASE" ]; then
   assembly_folder="${FWDIR}"/lib
-  CLASSPATH="$CLASSPATH:${FWDIR}/lib/spark/*"
+  lib_spark_jars=`ls "${FWDIR}"/lib/spark/*.jar`
 else
   assembly_folder="${ASSEMBLY_DIR}"
-  CLASSPATH="$CLASSPATH:${FWDIR}/assembly/src/universal/lib/spark/*"
+  lib_spark_jars=`ls "${FWDIR}"/assembly/src/universal/lib/spark/*.jar`
 fi
+# stable classpath for Spark JARs
+for J in $lib_spark_jars; do
+  lib_spark_classpath="${lib_spark_classpath}:${J}"
+done
+CLASSPATH="${CLASSPATH}${lib_spark_classpath}"
 
 ASSEMBLY_JAR=$(ls "${assembly_folder}"/pio-assembly*.jar 2>/dev/null)
 
