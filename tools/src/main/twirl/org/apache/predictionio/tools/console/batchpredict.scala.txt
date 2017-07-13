@@ -1,0 +1,15 @@
+Usage: pio batchpredict [--input <value>]
+                        [--output <value>]
+                        [--engine-instance-id <value>]
+
+Use an engine instance to process batch predictions. This command will pass all
+pass-through arguments to its underlying spark-submit command.
+
+  --input <value>
+      Path to file containing input queries; a multi-object JSON file with one
+      object per line. Default: batchpredict-input.json
+  --output <value>
+      Path to file containing output queries; a multi-object JSON file with one
+      object per line. Default: batchpredict-output.json
+  --engine-instance-id <value>
+      Engine instance ID. Default: the latest trained instance.

@@ -27,7 +27,8 @@ import org.apache.predictionio.tools.commands.{
   DashboardArgs, AdminServerArgs, ImportArgs, ExportArgs,
   BuildArgs, EngineArgs}
 import org.apache.predictionio.tools.{
-  EventServerArgs, SparkArgs, WorkflowArgs, ServerArgs, DeployArgs}
+  EventServerArgs, SparkArgs, WorkflowArgs, ServerArgs,
+  DeployArgs, BatchPredictArgs}
 import org.apache.predictionio.workflow.{JsonExtractorOption, WorkflowUtils}
 import org.json4s._
 import org.json4s.native.JsonMethods._
@@ -42,6 +43,7 @@ case class ConsoleArgs(
   workflow: WorkflowArgs = WorkflowArgs(),
   accessKey: AccessKeyArgs = AccessKeyArgs(),
   deploy: DeployArgs = DeployArgs(),
+  batchPredict: BatchPredictArgs = BatchPredictArgs(),
   eventServer: EventServerArgs = EventServerArgs(),
   adminServer: AdminServerArgs = AdminServerArgs(),
   dashboard: DashboardArgs = DashboardArgs(),
@@ -321,6 +323,38 @@ object Console extends Logging {
           opt[Int]("port") action { (x, c) =>
             c.copy(deploy = c.deploy.copy(port = x))
           } text("Port to unbind from. Default: 8000")
+        )
+      note("")
+      cmd("batchpredict").
+        text("Use an engine instance to process batch predictions. This\n" +
+          "command will send all pass-through arguments to its underlying\n" +
+          "spark-submit command.").
+        action { (_, c) =>
+          c.copy(commands = c.commands :+ "batchpredict")
+        } children(
+          opt[String]("input") action { (x, c) =>
+            c.copy(batchPredict = c.batchPredict.copy(inputFilePath = x))
+          } text("Path to file containing input queries; a " + 
+            "multi-object JSON file with one object per line; " + 
+            "default is 'batchpredict-input.json'."),
+          opt[String]("output") action { (x, c) =>
+            c.copy(batchPredict = c.batchPredict.copy(outputFilePath = x))
+          } text("Path to file containing output predictions; a " + 
+            "multi-object JSON file with one object per line; " + 
+            "default is 'batchpredict-output.json'."),
+          opt[String]("engine-instance-id") action { (x, c) =>
+            c.copy(engineInstanceId = Some(x))
+          } text("Engine instance ID."),
+          opt[String]("json-extractor") action { (x, c) =>
+            c.copy(workflow = c.workflow.copy(jsonExtractor = JsonExtractorOption.withName(x)))
+          } validate { x =>
+            if (JsonExtractorOption.values.map(_.toString).contains(x)) {
+              success
+            } else {
+              val validOptions = JsonExtractorOption.values.mkString("|")
+              failure(s"$x is not a valid json-extractor option [$validOptions]")
+            }
+          }
         )
       note("")
       cmd("dashboard").
@@ -644,6 +678,18 @@ object Console extends Logging {
             ca.verbose)
         case Seq("undeploy") =>
           Pio.undeploy(ca.deploy)
+        case Seq("batchpredict") =>
+          Pio.batchPredict(
+            ca.engine,
+            ca.engineInstanceId,
+            BatchPredictArgs(
+              ca.batchPredict.inputFilePath,
+              ca.batchPredict.outputFilePath,
+              ca.workflow.variantJson,
+              ca.workflow.jsonExtractor),
+            ca.spark,
+            ca.pioHome.get,
+            ca.verbose)
         case Seq("dashboard") =>
           Pio.dashboard(ca.dashboard)
         case Seq("eventserver") =>
@@ -756,6 +802,7 @@ object Console extends Logging {
     "build" -> txt.build().toString,
     "train" -> txt.train().toString,
     "deploy" -> txt.deploy().toString,
+    "batchpredict" -> txt.batchpredict().toString,
     "eventserver" -> txt.eventserver().toString,
     "adminserver" -> txt.adminserver().toString,
     "app" -> txt.app().toString,
