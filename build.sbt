@@ -162,7 +162,8 @@ val tools = (project in file("tools")).
   settings(commonSettings: _*).
   settings(commonTestSettings: _*).
   enablePlugins(GenJavadocPlugin).
-  enablePlugins(SbtTwirl)
+  enablePlugins(SbtTwirl).
+  settings(publishArtifact := false)
 
 val e2 = (project in file("e2")).
   settings(commonSettings: _*).
