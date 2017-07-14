@@ -327,21 +327,24 @@ object Console extends Logging {
       note("")
       cmd("batchpredict").
         text("Use an engine instance to process batch predictions. This\n" +
-          "command will send all pass-through arguments to its underlying\n" +
-          "spark-submit command.").
+              "command will pass all pass-through arguments to its underlying\n" +
+              "spark-submit command. All algorithm classes used in the engine\n" +
+              "must be serializable.").
         action { (_, c) =>
           c.copy(commands = c.commands :+ "batchpredict")
         } children(
           opt[String]("input") action { (x, c) =>
             c.copy(batchPredict = c.batchPredict.copy(inputFilePath = x))
-          } text("Path to file containing input queries; a " + 
-            "multi-object JSON file with one object per line; " + 
-            "default is 'batchpredict-input.json'."),
+          } text("Path to file containing queries; a multi-object JSON file\n" +
+                  "with one query object per line. Accepts any valid Hadoop\n" +
+                  "file URL. Default: batchpredict-input.json"),
           opt[String]("output") action { (x, c) =>
             c.copy(batchPredict = c.batchPredict.copy(outputFilePath = x))
-          } text("Path to file containing output predictions; a " + 
-            "multi-object JSON file with one object per line; " + 
-            "default is 'batchpredict-output.json'."),
+          } text("Path to file to receive results; a multi-object JSON file\n" + 
+                  "with one object per line, the prediction + original query.\n" + 
+                  "Accepts any valid Hadoop file URL. Actual output will be\n" + 
+                  "written as Hadoop partition files in a directory with the\n" +
+                  "output name. Default: batchpredict-output.json"),
           opt[String]("engine-instance-id") action { (x, c) =>
             c.copy(engineInstanceId = Some(x))
           } text("Engine instance ID."),
