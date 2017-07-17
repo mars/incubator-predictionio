@@ -31,6 +31,7 @@ import scala.sys.process._
 case class BatchPredictArgs(
   inputFilePath: String = "batchpredict-input.json",
   outputFilePath: String = "batchpredict-output.json",
+  queryPartitions: Option[Int] = None,
   variantJson: Option[File] = None,
   jsonExtractor: JsonExtractorOption = JsonExtractorOption.Both)
 
@@ -58,6 +59,9 @@ object RunBatchPredict extends Logging {
       "--engine-variant",
       batchPredictArgs.variantJson.getOrElse(
         new File(engineDirPath, "engine.json")).getCanonicalPath) ++
+      (if (batchPredictArgs.queryPartitions.isEmpty) Seq()
+        else Seq("--query-partitions",
+                  batchPredictArgs.queryPartitions.get.toString)) ++
       (if (verbose) Seq("--verbose") else Seq()) ++
       Seq("--json-extractor", batchPredictArgs.jsonExtractor.toString)
 

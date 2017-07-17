@@ -36,6 +36,7 @@ import scala.language.existentials
 case class BatchPredictConfig(
   inputFilePath: String = "batchpredict-input.json",
   outputFilePath: String = "batchpredict-output.json",
+  queryPartitions: Option[Int] = None,
   engineInstanceId: String = "",
   engineId: Option[String] = None,
   engineVersion: Option[String] = None,
@@ -76,6 +77,10 @@ object BatchPredict extends Logging {
         c.copy(outputFilePath = x)
       } text("Path to file containing output predictions; a " +
         "multi-object JSON file with one object per line.")
+      opt[Int]("query-partitions") action { (x, c) =>
+        c.copy(queryPartitions = Some(x))
+      } text("Limit concurrency of predictions by setting the number " +
+        "of partitions used internally for the RDD of queries.")
       opt[String]("engineId") action { (x, c) =>
         c.copy(engineId = Some(x))
       } text("Engine ID.")
@@ -180,7 +185,11 @@ object BatchPredict extends Logging {
       mode = "Batch Predict (runner)",
       sparkEnv = engineInstance.sparkConf)
 
-    val queriesRDD: RDD[String] = runSparkContext.textFile(config.inputFilePath)
+    val inputRDD: RDD[String] = runSparkContext.textFile(config.inputFilePath)
+    val queriesRDD: RDD[String] = config.queryPartitions match {
+      case Some(p) => inputRDD.repartition(p)
+      case None => inputRDD
+    }
 
     val predictionsRDD: RDD[String] = queriesRDD.map { queryString =>
       val jsonExtractorOption = config.jsonExtractor

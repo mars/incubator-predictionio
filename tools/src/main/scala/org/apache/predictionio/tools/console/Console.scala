@@ -345,6 +345,11 @@ object Console extends Logging {
                   "Accepts any valid Hadoop file URL. Actual output will be\n" +
                   "written as Hadoop partition files in a directory with the\n" +
                   "output name. Default: batchpredict-output.json"),
+          opt[Int]("query-partitions") action { (x, c) =>
+            c.copy(batchPredict = c.batchPredict.copy(queryPartitions = Some(x)))
+          } text("Limit concurrency of predictions by setting the number\n" +
+                  "of partitions used internally for the RDD of queries.\n" +
+                  "Default: number created by Spark context's `textFile`"),
           opt[String]("engine-instance-id") action { (x, c) =>
             c.copy(engineInstanceId = Some(x))
           } text("Engine instance ID."),
@@ -688,6 +693,7 @@ object Console extends Logging {
             BatchPredictArgs(
               ca.batchPredict.inputFilePath,
               ca.batchPredict.outputFilePath,
+              ca.batchPredict.queryPartitions,
               ca.workflow.variantJson,
               ca.workflow.jsonExtractor),
             ca.spark,
