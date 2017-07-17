@@ -340,9 +340,9 @@ object Console extends Logging {
                   "file URL. Default: batchpredict-input.json"),
           opt[String]("output") action { (x, c) =>
             c.copy(batchPredict = c.batchPredict.copy(outputFilePath = x))
-          } text("Path to file to receive results; a multi-object JSON file\n" + 
-                  "with one object per line, the prediction + original query.\n" + 
-                  "Accepts any valid Hadoop file URL. Actual output will be\n" + 
+          } text("Path to file to receive results; a multi-object JSON file\n" +
+                  "with one object per line, the prediction + original query.\n" +
+                  "Accepts any valid Hadoop file URL. Actual output will be\n" +
                   "written as Hadoop partition files in a directory with the\n" +
                   "output name. Default: batchpredict-output.json"),
           opt[String]("engine-instance-id") action { (x, c) =>

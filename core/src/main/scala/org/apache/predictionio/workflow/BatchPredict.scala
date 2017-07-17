@@ -70,11 +70,11 @@ object BatchPredict extends Logging {
     val parser = new scopt.OptionParser[BatchPredictConfig]("BatchPredict") {
       opt[String]("input") action { (x, c) =>
         c.copy(inputFilePath = x)
-      } text("Path to file containing input queries; a " + 
+      } text("Path to file containing input queries; a " +
         "multi-object JSON file with one object per line.")
       opt[String]("output") action { (x, c) =>
         c.copy(outputFilePath = x)
-      } text("Path to file containing output predictions; a " + 
+      } text("Path to file containing output predictions; a " +
         "multi-object JSON file with one object per line.")
       opt[String]("engineId") action { (x, c) =>
         c.copy(engineId = Some(x))

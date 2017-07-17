@@ -263,7 +263,7 @@ object Engine extends EitherLogging {
     }
   }
 
-  /** Batch predict with an engine. 
+  /** Batch predict with an engine.
     *
     * @param ea An instance of [[EngineArgs]]
     * @param engineInstanceId An instance of [[engineInstanceId]]
