@@ -185,7 +185,9 @@ object BatchPredict extends Logging {
       mode = "Batch Predict (runner)",
       sparkEnv = engineInstance.sparkConf)
 
-    val inputRDD: RDD[String] = runSparkContext.textFile(config.inputFilePath)
+    val inputRDD: RDD[String] = runSparkContext.
+      textFile(config.inputFilePath).
+      filter(_.trim.nonEmpty)
     val queriesRDD: RDD[String] = config.queryPartitions match {
       case Some(p) => inputRDD.repartition(p)
       case None => inputRDD
