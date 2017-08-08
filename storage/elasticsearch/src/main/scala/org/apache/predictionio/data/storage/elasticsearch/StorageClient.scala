@@ -25,13 +25,26 @@ import org.elasticsearch.client.RestClient
 
 import grizzled.slf4j.Logging
 
-case class ESClient(hosts: Seq[HttpHost]) {
-  def open(): RestClient = {
+object ESClient {
+  var _sharedRestClient: Option[RestClient] = None
+
+  def open(hosts: Seq[HttpHost]): RestClient = {
     try {
-      RestClient.builder(hosts: _*).build()
+      val newClient = _sharedRestClient match {
+        case Some(c)  => c
+        case None     => RestClient.builder(hosts: _*).build()
+      }
+      _sharedRestClient = Some(newClient)
+      newClient
     } catch {
       case e: Throwable =>
         throw new StorageClientException(e.getMessage, e)
+    }
+  }
+
+  def close(): Unit = {
+    if (!_sharedRestClient.isEmpty) {
+      _sharedRestClient.get.close()
     }
   }
 }
@@ -40,5 +53,5 @@ class StorageClient(val config: StorageClientConfig) extends BaseStorageClient
     with Logging {
   override val prefix = "ES"
 
-  val client = ESClient(ESUtils.getHttpHosts(config))
+  val client = ESClient.open(ESUtils.getHttpHosts(config))
 }
