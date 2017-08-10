@@ -21,11 +21,12 @@ import org.apache.http.HttpHost
 import org.apache.predictionio.data.storage.BaseStorageClient
 import org.apache.predictionio.data.storage.StorageClientConfig
 import org.apache.predictionio.data.storage.StorageClientException
+import org.apache.predictionio.workflow.CleanupFunctions
 import org.elasticsearch.client.RestClient
 
 import grizzled.slf4j.Logging
 
-object ESClient {
+object ESClient extends Logging {
   var _sharedRestClient: Option[RestClient] = None
 
   def open(hosts: Seq[HttpHost]): RestClient = {
@@ -45,6 +46,7 @@ object ESClient {
   def close(): Unit = {
     if (!_sharedRestClient.isEmpty) {
       _sharedRestClient.get.close()
+      _sharedRestClient = None
     }
   }
 }
@@ -52,6 +54,8 @@ object ESClient {
 class StorageClient(val config: StorageClientConfig) extends BaseStorageClient
     with Logging {
   override val prefix = "ES"
+
+  CleanupFunctions.add { ESClient.close }
 
   val client = ESClient.open(ESUtils.getHttpHosts(config))
 }
