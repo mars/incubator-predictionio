@@ -24,26 +24,42 @@ import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
 import org.apache.predictionio.data.storage.BaseStorageClient
 import org.apache.predictionio.data.storage.StorageClientConfig
 import org.apache.predictionio.data.storage.StorageClientException
+import org.apache.predictionio.workflow.CleanupFunctions
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 
 import grizzled.slf4j.Logging
 
-case class ESClient(
-    hosts: Seq[HttpHost],
-    basicAuth: Option[(String, String)] = None) {
+object ESClient extends Logging {
+  var _sharedRestClient: Option[RestClient] = None
 
-  def open(): RestClient = {
+  def open(
+    hosts: Seq[HttpHost],
+    basicAuth: Option[(String, String)] = None): RestClient = {
     try {
-      var builder = RestClient.builder(hosts: _*)
-      builder = basicAuth match {
-        case Some((username, password)) => builder.setHttpClientConfigCallback(
-          new BasicAuthProvider(username, password))
-        case None                       => builder}
-      builder.build()
+      val newClient = _sharedRestClient match {
+        case Some(c)  => c
+        case None     => {
+          var builder = RestClient.builder(hosts: _*)
+          builder = basicAuth match {
+            case Some((username, password)) => builder.setHttpClientConfigCallback(
+              new BasicAuthProvider(username, password))
+            case None                       => builder}
+          builder.build()
+        }
+      }
+      _sharedRestClient = Some(newClient)
+      newClient
     } catch {
       case e: Throwable =>
         throw new StorageClientException(e.getMessage, e)
+    }
+  }
+
+  def close(): Unit = {
+    if (!_sharedRestClient.isEmpty) {
+      _sharedRestClient.get.close()
+      _sharedRestClient = None
     }
   }
 }
@@ -62,7 +78,9 @@ class StorageClient(val config: StorageClientConfig)
       (username.getOrElse(""), password.getOrElse("")))
   }
 
-  val client: ESClient = ESClient(ESUtils.getHttpHosts(config), optionalBasicAuth)
+  CleanupFunctions.add { ESClient.close }
+
+  val client = ESClient.open(ESUtils.getHttpHosts(config), optionalBasicAuth)
 }
 
 class BasicAuthProvider(
