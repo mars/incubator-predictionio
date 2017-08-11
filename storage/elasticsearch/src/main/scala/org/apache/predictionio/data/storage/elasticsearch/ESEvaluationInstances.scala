@@ -103,8 +103,6 @@ class ESEvaluationInstances(client: RestClient, config: StorageClientConfig, ind
       case e: IOException =>
         error(s"Failed to access to /$index/$estype/$id", e)
         None
-    } finally {
-      client.close()
     }
   }
 
