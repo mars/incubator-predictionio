@@ -39,8 +39,9 @@ object CleanupFunctions {
     *
     * @param anonymous function containing cleanup code.
     */
-  def add(f: () => Unit) = {
+  def add(f: () => Unit): Seq[() => Unit] = {
     functions = functions :+ f
+    functions
   }
 
   /** Call all cleanup functions in order added.
@@ -49,7 +50,7 @@ object CleanupFunctions {
     * import org.apache.predictionio.workflow.CleanupFunctions
     *
     * try {
-    *   // Much code that needs cleanup 
+    *   // Much code that needs cleanup
     *   // whether successful or error thrown.
     * } finally {
     *   CleanupFunctions.run()
