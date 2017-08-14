@@ -44,8 +44,8 @@ ASSEMBLY_JARS=$(printf "${MAIN_JAR}\n${DATA_JARS}" | paste -sd "," -)
 CLASSPATH="${PIO_CONF_DIR}"
 
 # stable classpath for plugin JARs
-if [ -d "${assembly_folder}/plugins" ]; then
-  lib_plugin_jars=`ls "${assembly_folder}"/plugins/*.jar`
+if [ -d "${FWDIR}/plugins" ]; then
+  lib_plugin_jars=`ls "${FWDIR}"/plugins/*`
   lib_plugin_classpath=''
   for J in $lib_plugin_jars; do
     lib_plugin_classpath="${lib_plugin_classpath}:${J}"
