@@ -27,7 +27,7 @@ package org.apache.predictionio.workflow
   * be closed to allow the process to exit.
   */
 object CleanupFunctions {
-  var functions: Seq[() => Unit] = Seq.empty[() => Unit]
+  private var functions: Seq[() => Unit] = Seq.empty[() => Unit]
 
   /** Add a function to be called during cleanup.
     *
@@ -60,6 +60,6 @@ object CleanupFunctions {
     * @param anonymous function containing cleanup code.
     */
   def run(): Unit = {
-    functions.map { case f => f() }
+    functions.foreach { f => f() }
   }
 }

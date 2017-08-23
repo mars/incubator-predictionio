@@ -122,15 +122,13 @@ class ESPEvents(client: RestClient, config: StorageClientConfig, index: String)
           val jsonResponse = parse(EntityUtils.toString(response.getEntity))
           val result = (jsonResponse \ "result").extract[String]
           result match {
-            case "deleted" => true
+            case "deleted" =>
             case _ =>
               logger.error(s"[$result] Failed to update $index/$estype:$eventId")
-              false
           }
         } catch {
           case e: IOException =>
             logger.error(s"Failed to update $index/$estype:$eventId", e)
-            false
         }
       }
     }

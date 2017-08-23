@@ -31,7 +31,7 @@ import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 import grizzled.slf4j.Logging
 
 object ESClient extends Logging {
-  var _sharedRestClient: Option[RestClient] = None
+  private var _sharedRestClient: Option[RestClient] = None
 
   def open(
     hosts: Seq[HttpHost],
@@ -57,8 +57,8 @@ object ESClient extends Logging {
   }
 
   def close(): Unit = {
-    if (!_sharedRestClient.isEmpty) {
-      _sharedRestClient.get.close()
+    _sharedRestClient.foreach { client =>
+      client.close()
       _sharedRestClient = None
     }
   }

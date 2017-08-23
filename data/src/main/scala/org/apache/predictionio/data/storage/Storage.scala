@@ -22,6 +22,7 @@ import java.io.{PrintWriter, Serializable, StringWriter}
 import java.lang.reflect.InvocationTargetException
 
 import grizzled.slf4j.Logging
+import org.apache.commons.lang3.exception.ExceptionUtils
 import org.apache.predictionio.annotation.DeveloperApi
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -217,7 +218,8 @@ object Storage extends Logging {
         }
       } catch {
         case e: Throwable =>
-          error(s"${e.getMessage}\n${getStackTraceString(e)}\n\n")
+          val stackTrace = ExceptionUtils.getStackTrace(e)
+          error(s"${e.getMessage}\n${stackTrace}\n\n")
           errors += 1
           r -> DataObjectMeta("", "")
       }
@@ -285,8 +287,9 @@ object Storage extends Logging {
       Some(ClientMeta(sourceType, client, clientConfig))
     } catch {
       case e: Throwable =>
+        val stackTrace = ExceptionUtils.getStackTrace(e)
         error(s"Error initializing storage client for source ${k}.\n" +
-          s"${getStackTraceString(e)}\n\n")
+          s"${stackTrace}\n\n")
         errors += 1
         None
     }
@@ -463,11 +466,4 @@ object Storage extends Logging {
       }.getOrElse(Map.empty)
     }
   )
-
-  def getStackTraceString(e: Throwable): String = {
-    val writer = new StringWriter()
-    val printWriter = new PrintWriter(writer)
-    e.printStackTrace(printWriter)
-    writer.toString
-  }
 }
