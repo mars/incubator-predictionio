@@ -27,7 +27,7 @@ package org.apache.predictionio.workflow
   * be closed to allow the process to exit.
   */
 object CleanupFunctions {
-  private var functions: Seq[() => Unit] = Seq.empty[() => Unit]
+  @volatile private var functions: Seq[() => Unit] = Seq.empty[() => Unit]
 
   /** Add a function to be called during cleanup.
     *
