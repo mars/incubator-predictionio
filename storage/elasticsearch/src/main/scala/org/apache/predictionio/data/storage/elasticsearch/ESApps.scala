@@ -129,7 +129,7 @@ class ESApps(client: RestClient, config: StorageClientConfig, index: String)
     try {
       val json =
         ("query" ->
-          ("match_all" -> List.empty))
+          ("match_all" -> Nil))
       ESUtils.getAll[App](client, index, estype, compact(render(json)))
     } catch {
       case e: IOException =>

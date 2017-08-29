@@ -18,9 +18,6 @@
 
 package org.apache.predictionio.data.storage
 
-import java.io.{PrintWriter, Serializable, StringWriter}
-import java.lang.reflect.InvocationTargetException
-
 import grizzled.slf4j.Logging
 import org.apache.commons.lang3.exception.ExceptionUtils
 import org.apache.predictionio.annotation.DeveloperApi
@@ -80,7 +77,7 @@ trait BaseStorageClient {
 case class StorageClientConfig(
   parallel: Boolean = false, // parallelized access (RDD)?
   test: Boolean = false, // test mode config
-  properties: Map[String, String] = Map())
+  properties: Map[String, String] = Map.empty)
 
 /** :: DeveloperApi ::
   * Thrown when a StorageClient runs into an exceptional condition

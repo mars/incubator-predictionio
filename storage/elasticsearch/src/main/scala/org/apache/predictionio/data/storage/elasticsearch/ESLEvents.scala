@@ -28,7 +28,6 @@ import org.apache.http.util.EntityUtils
 import org.apache.predictionio.data.storage.Event
 import org.apache.predictionio.data.storage.LEvents
 import org.apache.predictionio.data.storage.StorageClientConfig
-import org.elasticsearch.client.RestClient
 import org.joda.time.DateTime
 import org.json4s._
 import org.json4s.JsonDSL._
@@ -36,7 +35,6 @@ import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization.write
 import org.json4s.ext.JodaTimeSerializers
 import grizzled.slf4j.Logging
-import org.elasticsearch.client.ResponseException
 import org.apache.http.message.BasicHeader
 
 class ESLEvents(val client: RestClient, config: StorageClientConfig, val index: String)
@@ -285,7 +283,8 @@ class ESLEvents(val client: RestClient, config: StorageClientConfig, val index: 
         val response = client.performRequest(
           "POST",
           s"/$index/$estype/_delete_by_query",
-          Map("refresh" -> ESUtils.getEventDataRefresh(config)).asJava)
+          Map("refresh" -> ESUtils.getEventDataRefresh(config)).asJava,
+          entity)
         val jsonResponse = parse(EntityUtils.toString(response.getEntity))
         val result = (jsonResponse \ "result").extract[String]
         result match {
@@ -328,7 +327,7 @@ class ESLEvents(val client: RestClient, config: StorageClientConfig, val index: 
       } catch {
         case e: IOException =>
           error(e.getMessage)
-          Iterator[Event]()
+          Iterator.empty
       }
     }
   }
