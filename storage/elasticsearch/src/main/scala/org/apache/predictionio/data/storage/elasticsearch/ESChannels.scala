@@ -27,14 +27,13 @@ import org.apache.http.util.EntityUtils
 import org.apache.predictionio.data.storage.Channel
 import org.apache.predictionio.data.storage.Channels
 import org.apache.predictionio.data.storage.StorageClientConfig
-import org.elasticsearch.client.RestClient
+import org.elasticsearch.client.{ResponseException, RestClient}
 import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization.write
 
 import grizzled.slf4j.Logging
-import org.elasticsearch.client.ResponseException
 
 class ESChannels(client: RestClient, config: StorageClientConfig, index: String)
     extends Channels with Logging {

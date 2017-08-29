@@ -29,14 +29,13 @@ import org.apache.predictionio.data.storage.EvaluationInstanceSerializer
 import org.apache.predictionio.data.storage.EvaluationInstances
 import org.apache.predictionio.data.storage.StorageClientConfig
 import org.apache.predictionio.data.storage.StorageClientException
-import org.elasticsearch.client.RestClient
+import org.elasticsearch.client.{ResponseException, RestClient}
 import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization.write
 
 import grizzled.slf4j.Logging
-import org.elasticsearch.client.ResponseException
 
 class ESEvaluationInstances(client: RestClient, config: StorageClientConfig, index: String)
     extends EvaluationInstances with Logging {

@@ -28,6 +28,7 @@ import org.apache.http.util.EntityUtils
 import org.apache.predictionio.data.storage.Event
 import org.apache.predictionio.data.storage.LEvents
 import org.apache.predictionio.data.storage.StorageClientConfig
+import org.elasticsearch.client.{ResponseException, RestClient}
 import org.joda.time.DateTime
 import org.json4s._
 import org.json4s.JsonDSL._
